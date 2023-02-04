@@ -29,7 +29,7 @@ def test_id3v2_2_size() -> None:
     )
 
 
-def test_id3v3_2() -> None:
+def test_id3v2_2() -> None:
     def encode_decode_id3v2_2(
         title: str,
         artist: str,
