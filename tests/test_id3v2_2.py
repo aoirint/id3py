@@ -1,12 +1,11 @@
+from typing import Optional
+
+from aoirint_id3 import DecodeId3v2_2Result, decode_id3v2_2, encode_id3v2_2
 from aoirint_id3.id3v2_2 import (
+    TextEncodingDescription,
     decode_id3v2_2_size,
     encode_id3v2_2_size,
-    DecodeId3v2_2Result,
-    decode_id3v2_2,
-    encode_id3v2_2,
-    TextEncodingDescription,
 )
-from typing import Optional
 
 
 def test_id3v3_2_size() -> None:
