@@ -9,7 +9,8 @@ import importlib.resources as ILR
 
 from .utils import decode_padded_str, safe_ljust
 
-TextEncodingDescription = Literal['ISO-8859-1', 'Unicode']
+TextEncodingDescription = Literal["ISO-8859-1", "Unicode"]
+
 
 class AvailableFrameId(BaseModel):
     frame_id: str
@@ -27,7 +28,12 @@ def __load_available_frame_ids() -> List[AvailableFrameId]:
 
 
 available_frame_ids = __load_available_frame_ids()
-available_text_information_frame_ids = list(filter(lambda frame_id: frame_id[0] == 'T', map(lambda item: item.frame_id, available_frame_ids)))
+available_text_information_frame_ids = list(
+    filter(
+        lambda frame_id: frame_id[0] == "T",
+        map(lambda item: item.frame_id, available_frame_ids),
+    )
+)
 
 
 def decode_id3v2_2_size(data: bytes) -> int:
@@ -87,27 +93,31 @@ def encode_id3v2_2_text_information_frame(
 
     frame_id_bytes = frame_id.encode(encoding="ascii")
     if len(frame_id_bytes) != 3:
-        raise Exception(f'Invalid Frame ID ({frame_id}). Size {len(frame_id)} != 3')
+        raise Exception(f"Invalid Frame ID ({frame_id}). Size {len(frame_id)} != 3")
 
     if frame_id not in available_text_information_frame_ids:
-        raise Exception(f'Unsupported text information frame identifier ({frame_id}).')
+        raise Exception(f"Unsupported text information frame identifier ({frame_id}).")
 
-    if text_encoding == 'ISO-8859-1':
-        text_encoding_python = 'latin-1'
+    if text_encoding == "ISO-8859-1":
+        text_encoding_python = "latin-1"
         text_encoding_byte = 0
-    elif text_encoding == 'Unicode':
-        text_encoding_python = 'utf-16be'
+    elif text_encoding == "Unicode":
+        text_encoding_python = "utf-16be"
         text_encoding_byte = 1
     else:
-       raise Exception(f'Unsupported text encoding ({text_encoding}). Use ISO-8859-1 (latin-1) or Unicode (utf-16be).')
+        raise Exception(
+            f"Unsupported text encoding ({text_encoding}). Use ISO-8859-1 (latin-1) or Unicode (utf-16be)."
+        )
 
     information_bytes = information.encode(encoding=text_encoding_python)
 
-    frame_size = 1 + len(information_bytes) # excluding frame identifier and size itself
+    frame_size = 1 + len(
+        information_bytes
+    )  # excluding frame identifier and size itself
     if frame_size == 0:
-        raise Exception('Invalid frame size. Size == 0 is not allowed')
+        raise Exception("Invalid frame size. Size == 0 is not allowed")
 
-    bio.write(frame_id.encode('ascii'))
+    bio.write(frame_id.encode("ascii"))
     bio.write(frame_size.to_bytes(3, byteorder="big"))
     bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
     bio.write(information_bytes)
@@ -120,15 +130,19 @@ class DecodeId3v2_2TextInformationFrameResult:
     information: str
 
 
-def decode_id3v2_2_text_information_frame_data(data: bytes) -> DecodeId3v2_2TextInformationFrameResult:
+def decode_id3v2_2_text_information_frame_data(
+    data: bytes,
+) -> DecodeId3v2_2TextInformationFrameResult:
     text_encoding_byte = data[0]
 
     if text_encoding_byte == 0:
-        text_encoding_python = 'latin-1'
+        text_encoding_python = "latin-1"
     elif text_encoding_byte == 1:
-        text_encoding_python = 'utf-16be'
+        text_encoding_python = "utf-16be"
     else:
-       raise Exception(f'Unsupported text encoding byte ({text_encoding_byte}). Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed.')
+        raise Exception(
+            f"Unsupported text encoding byte ({text_encoding_byte}). Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed."
+        )
 
     information = data[1:].decode(encoding=text_encoding_python)
     return DecodeId3v2_2TextInformationFrameResult(information=information)
@@ -136,48 +150,58 @@ def decode_id3v2_2_text_information_frame_data(data: bytes) -> DecodeId3v2_2Text
 
 def encode_id3v2_2_comment_frame(
     text_encoding: TextEncodingDescription,
-    language: str, # ISO 639-2
+    language: str,  # ISO 639-2
     content_description: str,
     actual_comment: str,
 ) -> bytes:
     bio = BytesIO()
 
-    if text_encoding == 'ISO-8859-1':
-        text_encoding_python = 'latin-1'
+    if text_encoding == "ISO-8859-1":
+        text_encoding_python = "latin-1"
         text_encoding_byte = 0
-        text_termination_bytes = b'\x00'
-    elif text_encoding == 'Unicode':
-        text_encoding_python = 'utf-16be'
+        text_termination_bytes = b"\x00"
+    elif text_encoding == "Unicode":
+        text_encoding_python = "utf-16be"
         text_encoding_byte = 1
-        text_termination_bytes = b'\x00\x00'
+        text_termination_bytes = b"\x00\x00"
     else:
-       raise Exception(f'Unsupported text encoding ({text_encoding}). Use ISO-8859-1 (latin-1) or Unicode (utf-16be).')
+        raise Exception(
+            f"Unsupported text encoding ({text_encoding}). Use ISO-8859-1 (latin-1) or Unicode (utf-16be)."
+        )
 
     # 2 or 3 latin alphabet code in lower case
-    if not re.match('^[a-z]{2,3}$', language):
-        raise Exception('Unsupported language. Use ISO 639-2.')
+    if not re.match("^[a-z]{2,3}$", language):
+        raise Exception("Unsupported language. Use ISO 639-2.")
 
-    language_bytes = language.encode('ascii')
+    language_bytes = language.encode("ascii")
     if len(language_bytes) == 3:
         pass
     elif len(language_bytes) == 2:
-        language_bytes += safe_ljust(language_bytes, 3) # always 3 bytes
+        language_bytes += safe_ljust(language_bytes, 3)  # always 3 bytes
     else:
-        raise Exception('Invalid language bytes. This is bug?')
+        raise Exception("Invalid language bytes. This is bug?")
 
-    content_description_bytes = content_description.encode(encoding=text_encoding_python)
+    content_description_bytes = content_description.encode(
+        encoding=text_encoding_python
+    )
     actual_comment_bytes = actual_comment.encode(encoding=text_encoding_python)
 
-    frame_size = 1 + len(language_bytes) + len(content_description_bytes) + len(text_termination_bytes) + len(actual_comment_bytes) # excluding frame identifier and size itself
+    frame_size = (
+        1
+        + len(language_bytes)
+        + len(content_description_bytes)
+        + len(text_termination_bytes)
+        + len(actual_comment_bytes)
+    )  # excluding frame identifier and size itself
     if frame_size == 0:
-        raise Exception('Invalid frame size. Size == 0 is not allowed')
+        raise Exception("Invalid frame size. Size == 0 is not allowed")
 
-    bio.write(b'COM')
+    bio.write(b"COM")
     bio.write(frame_size.to_bytes(3, byteorder="big"))
     bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
     bio.write(language_bytes)
     bio.write(content_description_bytes)
-    bio.write(text_termination_bytes) # NULL termination of content description
+    bio.write(text_termination_bytes)  # NULL termination of content description
     bio.write(actual_comment_bytes)
 
     return bio.getvalue()
@@ -185,7 +209,7 @@ def encode_id3v2_2_comment_frame(
 
 @dataclass
 class DecodeId3v2_2CommentFrameResult:
-    language: str # ISO 639-2
+    language: str  # ISO 639-2
     content_description: str
     actual_comment: str
 
@@ -194,18 +218,24 @@ def decode_id3v2_2_comment_frame_data(data: bytes) -> DecodeId3v2_2CommentFrameR
     text_encoding_byte = data[0]
 
     if text_encoding_byte == 0:
-        text_encoding_python = 'latin-1'
-        text_termination_bytes = b'\x00'
+        text_encoding_python = "latin-1"
+        text_termination_bytes = b"\x00"
     elif text_encoding_byte == 1:
-        text_encoding_python = 'utf-16be'
-        text_termination_bytes = b'\x00\x00'
+        text_encoding_python = "utf-16be"
+        text_termination_bytes = b"\x00\x00"
     else:
-       raise Exception(f'Unsupported text encoding byte ({text_encoding_byte}). Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed.')
+        raise Exception(
+            f"Unsupported text encoding byte ({text_encoding_byte}). Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed."
+        )
 
-    language = decode_padded_str(data[1:4], encoding='ascii')
+    language = decode_padded_str(data[1:4], encoding="ascii")
 
-    content_descirption_bytes, actual_comment_bytes = data[4:].split(text_termination_bytes, maxsplit=2)
-    content_descirption = content_descirption_bytes.decode(encoding=text_encoding_python)
+    content_descirption_bytes, actual_comment_bytes = data[4:].split(
+        text_termination_bytes, maxsplit=2
+    )
+    content_descirption = content_descirption_bytes.decode(
+        encoding=text_encoding_python
+    )
     actual_comment = actual_comment_bytes.decode(encoding=text_encoding_python)
 
     return DecodeId3v2_2CommentFrameResult(
@@ -235,37 +265,51 @@ def encode_id3v2_2(
     frames_bio = BytesIO()
 
     # TT2 frame
-    frames_bio.write(encode_id3v2_2_text_information_frame(
-        frame_id='TT2',
-        text_encoding=text_encoding,
-        information=title,
-    ))
-    frames_bio.write(encode_id3v2_2_text_information_frame(
-        frame_id='TP1',
-        text_encoding=text_encoding,
-        information=artist,
-    ))
-    frames_bio.write(encode_id3v2_2_text_information_frame(
-        frame_id='TAL',
-        text_encoding=text_encoding,
-        information=album,
-    ))
-    frames_bio.write(encode_id3v2_2_text_information_frame(
-        frame_id='TYE',
-        text_encoding=text_encoding,
-        information=year,
-    ))
-    frames_bio.write(encode_id3v2_2_comment_frame(
-        text_encoding=text_encoding,
-        language='eng', # English
-        content_description='Comment',
-        actual_comment=comment,
-    ))
-    frames_bio.write(encode_id3v2_2_text_information_frame(
-        frame_id='TRK',
-        text_encoding=text_encoding,
-        information=f'{track_number}/{total_track_number}' if total_track_number is not None else str(track_number),
-    ))
+    frames_bio.write(
+        encode_id3v2_2_text_information_frame(
+            frame_id="TT2",
+            text_encoding=text_encoding,
+            information=title,
+        )
+    )
+    frames_bio.write(
+        encode_id3v2_2_text_information_frame(
+            frame_id="TP1",
+            text_encoding=text_encoding,
+            information=artist,
+        )
+    )
+    frames_bio.write(
+        encode_id3v2_2_text_information_frame(
+            frame_id="TAL",
+            text_encoding=text_encoding,
+            information=album,
+        )
+    )
+    frames_bio.write(
+        encode_id3v2_2_text_information_frame(
+            frame_id="TYE",
+            text_encoding=text_encoding,
+            information=year,
+        )
+    )
+    frames_bio.write(
+        encode_id3v2_2_comment_frame(
+            text_encoding=text_encoding,
+            language="eng",  # English
+            content_description="Comment",
+            actual_comment=comment,
+        )
+    )
+    frames_bio.write(
+        encode_id3v2_2_text_information_frame(
+            frame_id="TRK",
+            text_encoding=text_encoding,
+            information=f"{track_number}/{total_track_number}"
+            if total_track_number is not None
+            else str(track_number),
+        )
+    )
 
     frames_bytes = frames_bio.getvalue()
 
@@ -273,11 +317,13 @@ def encode_id3v2_2(
     size = len(frames_bytes)
 
     bio = BytesIO()
-    bio.write(encode_id3v2_2_header(
-        size=size,
-        flag_is_async=flag_is_async,
-        flag_is_compressed=flag_is_compressed,
-    ))
+    bio.write(
+        encode_id3v2_2_header(
+            size=size,
+            flag_is_async=flag_is_async,
+            flag_is_compressed=flag_is_compressed,
+        )
+    )
     bio.write(frames_bytes)
 
     return bio.getvalue()
@@ -302,18 +348,18 @@ def decode_id3v2_2(data: bytes) -> DecodeId3v2_2Result:
     if identifier != b"ID3":
         raise Exception("ID3v2_2: Invalid identifier")
 
-    major_version = int.from_bytes(bio.read(1), byteorder='big')
-    revision_number = int.from_bytes(bio.read(1), byteorder='big')
+    major_version = int.from_bytes(bio.read(1), byteorder="big")
+    revision_number = int.from_bytes(bio.read(1), byteorder="big")
     if major_version != 2 or revision_number != 0:
-        raise Exception('ID3v2_2: Invalid version')
+        raise Exception("ID3v2_2: Invalid version")
 
-    flag = int.from_bytes(bio.read(1), byteorder='big')
+    flag = int.from_bytes(bio.read(1), byteorder="big")
     flag_is_async = (flag & 0b1000_0000) == 0b1000_0000
     flag_is_compressed = (flag & 0b0100_0000) == 0b0100_0000
 
     size_left = decode_id3v2_2_size(data=bio.read(4))
     if size_left == 0:
-        raise Exception('ID3v2_2: Invalid size')
+        raise Exception("ID3v2_2: Invalid size")
 
     title: str = None
     artist: str = None
@@ -324,29 +370,29 @@ def decode_id3v2_2(data: bytes) -> DecodeId3v2_2Result:
     total_track_number: int = None
 
     while size_left > 0:
-        frame_id = bio.read(3).decode('ascii')
-        frame_size = int.from_bytes(bio.read(3), byteorder='big')
+        frame_id = bio.read(3).decode("ascii")
+        frame_size = int.from_bytes(bio.read(3), byteorder="big")
         frame_data = bio.read(frame_size)
 
-        if frame_id[0] == 'T':
+        if frame_id[0] == "T":
             result = decode_id3v2_2_text_information_frame_data(data=frame_data)
-            if frame_id == 'TT2':
+            if frame_id == "TT2":
                 title = result.information
-            elif frame_id == 'TP1':
+            elif frame_id == "TP1":
                 artist = result.information
-            elif frame_id == 'TAL':
+            elif frame_id == "TAL":
                 album = result.information
-            elif frame_id == 'TYE':
+            elif frame_id == "TYE":
                 year = result.information
-            elif frame_id == 'TRK':
-                value = result.information.split('/', maxsplit=2)
+            elif frame_id == "TRK":
+                value = result.information.split("/", maxsplit=2)
                 track_number = int(value[0])
                 if len(value) == 2:
                     total_track_number = int(value[1])
             else:
                 # unsupported frame
                 pass
-        elif frame_id == 'COM':
+        elif frame_id == "COM":
             result = decode_id3v2_2_comment_frame_data(data=frame_data)
             comment = result.actual_comment
         else:

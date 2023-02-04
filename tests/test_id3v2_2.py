@@ -1,4 +1,11 @@
-from aoirint_id3.id3v2_2 import decode_id3v2_2_size, encode_id3v2_2_size, DecodeId3v2_2Result, decode_id3v2_2, encode_id3v2_2, TextEncodingDescription
+from aoirint_id3.id3v2_2 import (
+    decode_id3v2_2_size,
+    encode_id3v2_2_size,
+    DecodeId3v2_2Result,
+    decode_id3v2_2,
+    encode_id3v2_2,
+    TextEncodingDescription,
+)
 from typing import Optional
 
 
