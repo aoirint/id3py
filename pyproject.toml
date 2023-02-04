@@ -21,6 +21,7 @@ packages = [{include = "aoirint_id3"}]
 
 [tool.poetry.dependencies]
 python = "~3.9"
+pydantic = "^1.10.4"
 
 
 [tool.poetry.group.test.dependencies]
