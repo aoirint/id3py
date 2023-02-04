@@ -26,6 +26,9 @@ Python Library to parse audio ID3 tag specified by [ID3.org](https://id3.org).
 - TRK: Track number and Total track number
 - COM: Comment
 
+## TODO
+
+- Support ID3v2.3 (most popular version in 2023)
 
 ## Poetry reference
 
