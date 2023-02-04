@@ -1,5 +1,7 @@
 # aoirint_id3py
 
+**This library is under construction before alpha stage. API will be changed without notice. There are many bugs and unimplemented features.**
+
 Python Library to parse audio ID3 tag specified by [ID3.org](https://id3.org).
 
 ## Implementation
