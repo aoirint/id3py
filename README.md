@@ -17,6 +17,16 @@ Python Library to parse audio ID3 tag specified by [ID3.org](https://id3.org).
 - ID3v2.2
 
 
+## Implemented ID3v2 Frames
+
+- TT2: Song title
+- TP1: Artist name
+- TAL: Album name
+- TYE: Year
+- TRK: Track number and Total track number
+- COM: Comment
+
+
 ## Poetry reference
 
 ### Lock Python version with pyenv
