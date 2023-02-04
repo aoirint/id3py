@@ -1,6 +1,3 @@
-from dataclasses import dataclass
-from io import BytesIO
-
 from aoirint_id3 import DecodeId3v1Result, decode_id3v1, encode_id3v1
 
 
@@ -10,7 +7,7 @@ def encode_decode_id3v1(
     album: str,
     year: str,
     comment: str,
-    genre_id: int,
+    genre_number: int,
     encoding: str,
 ) -> DecodeId3v1Result:
     return decode_id3v1(
@@ -20,7 +17,7 @@ def encode_decode_id3v1(
             album=album,
             year=year,
             comment=comment,
-            genre_id=genre_id,
+            genre_number=genre_number,
             encoding=encoding,
         ),
         encoding=encoding,
@@ -33,7 +30,7 @@ def assert_encode_decode_id3v1(
     album: str,
     year: str,
     comment: str,
-    genre_id: int,
+    genre_number: int,
     encoding: str,
 ) -> None:
     tag = encode_decode_id3v1(
@@ -42,7 +39,7 @@ def assert_encode_decode_id3v1(
         album=album,
         year=year,
         comment=comment,
-        genre_id=genre_id,
+        genre_number=genre_number,
         encoding=encoding,
     )
     assert tag.title == title
@@ -50,7 +47,7 @@ def assert_encode_decode_id3v1(
     assert tag.album == album
     assert tag.year == year
     assert tag.comment == comment
-    assert tag.genre_id == genre_id
+    assert tag.genre_number == genre_number
 
 
 def test_id3v1() -> None:
@@ -60,6 +57,6 @@ def test_id3v1() -> None:
         album="Album Name",
         year="2023",
         comment="Comment",
-        genre_id=12,  # Others
+        genre_number=12,  # Others
         encoding="ascii",
     )
