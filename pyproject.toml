@@ -24,6 +24,10 @@ description = ""
 authors = ["aoirint <aoirint@gmail.com>"]
 readme = "README.md"
 packages = [{include = "aoirint_id3"}]
+include = [
+  { path = "aoirint_id3/*.csv", format = ["sdist", "wheel"] },
+  { path = "aoirint_id3/**/*.csv", format = ["sdist", "wheel"] }
+]
 
 [tool.poetry.dependencies]
 python = "~3.9"
