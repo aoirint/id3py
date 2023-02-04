@@ -8,7 +8,7 @@ from aoirint_id3.id3v2_2 import (
 )
 
 
-def test_id3v3_2_size() -> None:
+def test_id3v2_2_size() -> None:
     def encode_decode_id3v2_2_size(value: int) -> int:
         return decode_id3v2_2_size(
             data=encode_id3v2_2_size(value=value),
