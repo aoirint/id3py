@@ -1,0 +1,37 @@
+[tool.pysen]
+version = "0.10.3"
+
+[tool.pysen.lint]
+enable_black = true
+enable_flake8 = true
+enable_isort = true
+enable_mypy = true
+
+[[tool.pysen.lint.mypy_targets]]
+  paths = ["aoirint_id3/", "tests/"]
+
+
+[tool.poetry]
+name = "aoirint-id3py"
+version = "0.0.0"
+description = ""
+authors = ["aoirint <aoirint@gmail.com>"]
+readme = "README.md"
+packages = [{include = "aoirint_id3py"}]
+
+[tool.poetry.dependencies]
+python = "~3.9"
+
+
+[tool.poetry.group.test.dependencies]
+pysen = "~0.10.3"
+black = "^22.12.0"
+flake8-bugbear = "^23.1.0"
+flake8 = "^6.0.0"
+isort = "^5.12.0"
+mypy = "~0.991"
+pytest = "^7.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
