@@ -31,6 +31,7 @@ This library is intended to be a non-GPL dependent ID3 tag parser.
 ## TODO
 
 - Support ID3v2.3 (most popular version in 2023)
+- User-friendly ID3v2 Frame API
 
 ## Poetry reference
 
