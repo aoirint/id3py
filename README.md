@@ -4,6 +4,12 @@
 
 Python Library to parse audio ID3 tag specified by [ID3.org](https://id3.org).
 
+## Environment
+
+- Windows 10, Ubuntu 20.04
+- Python 3.9, 3.10, 3.11
+
+
 ## Implementation
 
 - ID3v1
