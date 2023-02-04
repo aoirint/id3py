@@ -1,7 +1,31 @@
+import csv
+import importlib.resources as ILR
 from dataclasses import dataclass
-from io import BytesIO
+from io import BytesIO, StringIO
+from typing import List
+
+from pydantic import BaseModel, parse_obj_as
 
 from .utils import decode_padded_str, safe_ljust
+
+
+class AvailableGenre(BaseModel):
+    genre_id: int
+    genre_name: str
+
+
+def __load_available_genres() -> List[AvailableGenre]:
+    genres_csv_text = ILR.read_text("aoirint_id3", "id3v1_genres.csv")
+    reader = csv.DictReader(
+        StringIO(genres_csv_text), fieldnames=["genre_id", "genre_name"]
+    )
+    next(reader)
+
+    records = list(reader)
+    return parse_obj_as(List[AvailableGenre], records)
+
+
+available_genres = __load_available_genres()
 
 
 def encode_id3v1_1(
