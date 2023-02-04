@@ -12,12 +12,12 @@ enable_mypy = true
 
 
 [tool.poetry]
-name = "aoirint-id3py"
+name = "aoirint-id3"
 version = "0.0.0"
 description = ""
 authors = ["aoirint <aoirint@gmail.com>"]
 readme = "README.md"
-packages = [{include = "aoirint_id3py"}]
+packages = [{include = "aoirint_id3"}]
 
 [tool.poetry.dependencies]
 python = "~3.9"
