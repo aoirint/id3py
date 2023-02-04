@@ -1,5 +1,12 @@
 # aoirint_id3py
 
+## Implementation
+
+- ID3v1
+- ID3v1.1
+- ID3v2.2
+
+
 ## Poetry reference
 
 ### Lock Python version with pyenv
