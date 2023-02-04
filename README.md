@@ -1,6 +1,6 @@
 # aoirint_id3py
 
-Parsing Library of audio ID3 tag specified by [ID3.org](https://id3.org).
+Python Library to parse audio ID3 tag specified by [ID3.org](https://id3.org).
 
 ## Implementation
 
