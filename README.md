@@ -40,7 +40,9 @@ This library is intended to be a non-GPL dependent ID3 tag parser.
 ## TODO
 
 - Support more ID3v2.2 frames
+  - Album art
 - Support more ID3v2.3 frames
+  - Album art
 - User-friendly ID3v2 Frame API
 
 ## Poetry reference
