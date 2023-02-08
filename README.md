@@ -75,5 +75,6 @@ poetry run pytest tests/
 ## Reference
 
 - <https://web.archive.org/web/20210816205319/https://id3.org/id3v2-00>
+- <https://web.archive.org/web/20220525235101/https://id3.org/d3v2.3.0>
 - <https://ja.wikipedia.org/w/index.php?title=ID3%E3%82%BF%E3%82%B0&oldid=89477951>
 - <https://www.loc.gov/standards/iso639-2/php/code_list.php>
