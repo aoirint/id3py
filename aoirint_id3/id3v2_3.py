@@ -219,7 +219,7 @@ def decode_id3v2_3_text_information_frame_data(
             "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16) is allowed."
         )
 
-    information = data[1:].decode(encoding=text_encoding_python).strip()  # remove BOM
+    information = data[1:].decode(encoding=text_encoding_python)  # BOM removed
 
     return DecodeId3v2_3TextInformationFrameResult(
         information=information,
