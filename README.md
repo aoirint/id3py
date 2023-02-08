@@ -36,13 +36,13 @@ This library is intended to be a non-GPL dependent ID3 tag parser.
 - TYER: Year
 - TRCK: Track number and Total track number
 - COMM: Comment
+- APIC: Album art
 
 ## TODO
 
 - Support more ID3v2.2 frames
   - Album art
 - Support more ID3v2.3 frames
-  - Album art
 - User-friendly ID3v2 Frame API
 
 ## Poetry reference
