@@ -16,10 +16,10 @@ This library is intended to be a non-GPL dependent ID3 tag parser.
 
 - ID3v1
 - ID3v1.1
-- ID3v2.2
+- (Partial) ID3v2.2
+- (Partial) ID3v2.3
 
-
-## Implemented ID3v2.2 Frames
+### Implemented ID3v2.2 Frames
 
 - TT2: Song title
 - TP1: Artist name
@@ -28,9 +28,19 @@ This library is intended to be a non-GPL dependent ID3 tag parser.
 - TRK: Track number and Total track number
 - COM: Comment
 
+### Implemented ID3v2.3 Frames
+
+- TIT2: Song title
+- TPE1: Artist name
+- TALB: Album name
+- TYER: Year
+- TRCK: Track number and Total track number
+- COMM: Comment
+
 ## TODO
 
-- Support ID3v2.3 (most popular version in 2023)
+- Support more ID3v2.2 frames
+- Support more ID3v2.3 frames
 - User-friendly ID3v2 Frame API
 
 ## Poetry reference
