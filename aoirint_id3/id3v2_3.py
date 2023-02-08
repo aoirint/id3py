@@ -288,12 +288,12 @@ def decode_id3v2_3_comment_frame_data(data: bytes) -> DecodeId3v2_3CommentFrameR
         text_encoding_python = "latin-1"
         text_termination_bytes = b"\x00"
     elif text_encoding_byte == 1:
-        text_encoding_python = "utf-16be"  # UTF-16 Big Endian with BOM
+        text_encoding_python = "utf-16"  # BOM removed
         text_termination_bytes = b"\x00\x00"
     else:
         raise Exception(
             f"Unsupported text encoding byte ({text_encoding_byte}). "
-            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed."
+            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16) is allowed."
         )
 
     language = decode_padded_str(data[1:4], encoding="ascii")
