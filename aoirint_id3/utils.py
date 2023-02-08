@@ -6,5 +6,5 @@ def safe_ljust(data: bytes, length: int) -> bytes:
 
 
 def decode_padded_str(data: bytes, encoding: str) -> str:
-    unpadded_data = data.split(b"\x00", maxsplit=2)
+    unpadded_data = data.split(b"\x00", maxsplit=1)
     return unpadded_data[0].decode(encoding=encoding)

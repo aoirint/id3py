@@ -299,7 +299,7 @@ def decode_id3v2_3_comment_frame_data(data: bytes) -> DecodeId3v2_3CommentFrameR
     language = decode_padded_str(data[1:4], encoding="ascii")
 
     content_descirption_bytes, actual_comment_bytes = data[4:].split(
-        text_termination_bytes, maxsplit=2
+        text_termination_bytes, maxsplit=1
     )
     content_descirption = content_descirption_bytes.decode(
         encoding=text_encoding_python
@@ -374,12 +374,12 @@ def decode_id3v2_3_attached_picture_frame_data(
             "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed."
         )
 
-    mime_type_bytes, data_left = data[1:].split(b"\x00", maxsplit=2)
+    mime_type_bytes, data_left = data[1:].split(b"\x00", maxsplit=1)
     mime_type = mime_type_bytes.decode(encoding="ascii")
 
     picture_type = data_left[0]
     descirption_bytes, picture_data = data_left[1:].split(
-        text_termination_bytes, maxsplit=2
+        text_termination_bytes, maxsplit=1
     )
 
     descirption = descirption_bytes.decode(encoding=text_encoding_python)
@@ -576,7 +576,7 @@ def decode_id3v2_3(data: bytes) -> DecodeId3v2_3Result:
             elif frame_id == "TYER":
                 year = text_information_frame.information
             elif frame_id == "TRCK":
-                value = text_information_frame.information.split("/", maxsplit=2)
+                value = text_information_frame.information.split("/", maxsplit=1)
                 track_number = int(value[0])
                 if len(value) == 2:
                     total_track_number = int(value[1])
