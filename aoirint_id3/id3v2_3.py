@@ -469,17 +469,18 @@ def decode_id3v2_3(data: bytes) -> DecodeId3v2_3Result:
     if size_left == 0:
         raise Exception("ID3v2_3: Invalid size")
 
-    extended_header_size = int.from_bytes(bio.read(4), byteorder="big")
-    extended_flag1 = int.from_bytes(bio.read(1), byteorder="big")
-    extended_flag2 = int.from_bytes(bio.read(1), byteorder="big")
-    size_of_padding = int.from_bytes(bio.read(4), byteorder="big")
-    extended_flag_is_crc_data_present = (extended_flag1 & 0b1000_0000) == 0b1000_0000
-
-    size_left -= 4 + extended_header_size
-
     crc_data: Optional[bytes] = None
-    if extended_flag_is_crc_data_present:
-        crc_data = bio.read(4)
+    if flag_is_extended_header:
+        extended_header_size = int.from_bytes(bio.read(4), byteorder="big")
+        extended_flag1 = int.from_bytes(bio.read(1), byteorder="big")
+        extended_flag2 = int.from_bytes(bio.read(1), byteorder="big")
+        size_of_padding = int.from_bytes(bio.read(4), byteorder="big")
+        extended_flag_is_crc_data_present = (extended_flag1 & 0b1000_0000) == 0b1000_0000
+
+        size_left -= 4 + extended_header_size
+
+        if extended_flag_is_crc_data_present:
+            crc_data = bio.read(4)
 
     title: Optional[str] = None
     artist: Optional[str] = None
