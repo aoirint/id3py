@@ -212,11 +212,11 @@ def decode_id3v2_3_text_information_frame_data(
     if text_encoding_byte == 0:
         text_encoding_python = "latin-1"
     elif text_encoding_byte == 1:
-        text_encoding_python = "utf-16be"  # UTF-16 Big Endian with BOM
+        text_encoding_python = "utf-16"  # UTF-16 with BOM
     else:
         raise Exception(
             f"Unsupported text encoding byte ({text_encoding_byte}). "
-            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed."
+            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16) is allowed."
         )
 
     information = data[1:].decode(encoding=text_encoding_python).strip()  # remove BOM
