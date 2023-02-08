@@ -173,68 +173,56 @@ def encode_id3v2_3_frame(
     return bio.getvalue()
 
 
-def encode_id3v2_3_user_defined_text_information_frame_data(
+def encode_id3v2_3_text_information_frame_data(
     text_encoding: TextEncodingDescription,
-    description: str,
-    value: str,
+    information: str,
 ) -> bytes:
     bio = BytesIO()
 
     if text_encoding == "ISO-8859-1":
         text_encoding_python = "latin-1"
-        text_termination_bytes = b"\x00"
         text_encoding_byte = 0
     elif text_encoding == "Unicode":
         text_encoding_python = "utf-16be"  # UTF-16 Big Endian with BOM
         text_encoding_byte = 1
-        text_termination_bytes = b"\x00\x00"
     else:
         raise Exception(
             f"Unsupported text encoding ({text_encoding}). "
             "Use ISO-8859-1 (latin-1) or Unicode (utf-16be)."
         )
 
-    description_bytes = description.encode(encoding=text_encoding_python)
-    value_bytes = value.encode(encoding=text_encoding_python)
+    information_bytes = information.encode(encoding=text_encoding_python)
 
     bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
-    bio.write(description_bytes)
-    bio.write(text_termination_bytes)
-    bio.write(value_bytes)
+    bio.write(information_bytes)
 
     return bio.getvalue()
 
 
 @dataclass
-class DecodeId3v2_3UserDefinedTextInformationFrameResult:
-    description: str
-    value: str
+class DecodeId3v2_3TextInformationFrameResult:
+    information: str
 
 
-def decode_id3v2_3_user_defined_text_information_frame_data(
+def decode_id3v2_3_text_information_frame_data(
     data: bytes,
-) -> DecodeId3v2_3UserDefinedTextInformationFrameResult:
+) -> DecodeId3v2_3TextInformationFrameResult:
     text_encoding_byte = data[0]
 
     if text_encoding_byte == 0:
         text_encoding_python = "latin-1"
-        text_termination_bytes = b"\x00"
     elif text_encoding_byte == 1:
         text_encoding_python = "utf-16be"  # UTF-16 Big Endian with BOM
-        text_termination_bytes = b"\x00\x00"
     else:
         raise Exception(
             f"Unsupported text encoding byte ({text_encoding_byte}). "
             "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed."
         )
 
-    description_bytes, value_bytes = data[1:].split(text_termination_bytes, maxsplit=2)
-    description = description_bytes.decode(encoding=text_encoding_python)
-    value = value_bytes.decode(encoding=text_encoding_python)
+    information = data[1:].decode(encoding=text_encoding_python)
 
-    return DecodeId3v2_3UserDefinedTextInformationFrameResult(
-        description=description,
-        value=value,
+    return DecodeId3v2_3TextInformationFrameResult(
+        information=information,
     )
 
 
@@ -349,40 +337,36 @@ def encode_id3v2_3(
     frames_bio.write(
         encode_id3v2_3_frame(
             frame_id="TIT2",
-            frame_data=encode_id3v2_3_user_defined_text_information_frame_data(
+            frame_data=encode_id3v2_3_text_information_frame_data(
                 text_encoding=text_encoding,
-                description="Title/Songname/Content description",
-                value=title,
+                information=title,
             ),
         ),
     )
     frames_bio.write(
         encode_id3v2_3_frame(
             frame_id="TPE1",
-            frame_data=encode_id3v2_3_user_defined_text_information_frame_data(
+            frame_data=encode_id3v2_3_text_information_frame_data(
                 text_encoding=text_encoding,
-                description="Lead artist(s)/Lead performer(s)/Soloist(s)/Performing group",
-                value=artist,
+                information=artist,
             ),
         ),
     )
     frames_bio.write(
         encode_id3v2_3_frame(
             frame_id="TALB",
-            frame_data=encode_id3v2_3_user_defined_text_information_frame_data(
+            frame_data=encode_id3v2_3_text_information_frame_data(
                 text_encoding=text_encoding,
-                description="Album/Movie/Show title",
-                value=album,
+                information=album,
             ),
         ),
     )
     frames_bio.write(
         encode_id3v2_3_frame(
             frame_id="TYER",
-            frame_data=encode_id3v2_3_user_defined_text_information_frame_data(
+            frame_data=encode_id3v2_3_text_information_frame_data(
                 text_encoding=text_encoding,
-                description="Year",
-                value=year,
+                information=year,
             ),
         ),
     )
@@ -400,10 +384,9 @@ def encode_id3v2_3(
     frames_bio.write(
         encode_id3v2_3_frame(
             frame_id="TRCK",
-            frame_data=encode_id3v2_3_user_defined_text_information_frame_data(
+            frame_data=encode_id3v2_3_text_information_frame_data(
                 text_encoding=text_encoding,
-                description="Track number/Position in set",
-                value=f"{track_number}/{total_track_number}"
+                information=f"{track_number}/{total_track_number}"
                 if total_track_number is not None
                 else str(track_number),
             ),
@@ -469,18 +452,20 @@ def decode_id3v2_3(data: bytes) -> DecodeId3v2_3Result:
     if size_left == 0:
         raise Exception("ID3v2_3: Invalid size")
 
-    crc_data: Optional[bytes] = None
+    # crc_data: Optional[bytes] = None
     if flag_is_extended_header:
         extended_header_size = int.from_bytes(bio.read(4), byteorder="big")
         extended_flag1 = int.from_bytes(bio.read(1), byteorder="big")
-        extended_flag2 = int.from_bytes(bio.read(1), byteorder="big")
-        size_of_padding = int.from_bytes(bio.read(4), byteorder="big")
-        extended_flag_is_crc_data_present = (extended_flag1 & 0b1000_0000) == 0b1000_0000
+        int.from_bytes(bio.read(1), byteorder="big")  # extended_flag2
+        int.from_bytes(bio.read(4), byteorder="big")  # size_of_padding
+        extended_flag_is_crc_data_present = (
+            extended_flag1 & 0b1000_0000
+        ) == 0b1000_0000
 
         size_left -= 4 + extended_header_size
 
         if extended_flag_is_crc_data_present:
-            crc_data = bio.read(4)
+            bio.read(4)  # crc_data
 
     title: Optional[str] = None
     artist: Optional[str] = None
@@ -493,24 +478,24 @@ def decode_id3v2_3(data: bytes) -> DecodeId3v2_3Result:
     while size_left > 0:
         frame_id = bio.read(4).decode("ascii")
         frame_size = int.from_bytes(bio.read(4), byteorder="big")
-        frame_flag1 = int.from_bytes(bio.read(1), byteorder="big")
-        frame_flag2 = int.from_bytes(bio.read(1), byteorder="big")
+        int.from_bytes(bio.read(1), byteorder="big")  # frame_flag1
+        int.from_bytes(bio.read(1), byteorder="big")  # frame_flag2
         frame_data = bio.read(frame_size)
 
         if frame_id[0] == "T":
-            text_information_frame = (
-                decode_id3v2_3_user_defined_text_information_frame_data(data=frame_data)
+            text_information_frame = decode_id3v2_3_text_information_frame_data(
+                data=frame_data
             )
             if frame_id == "TIT2":
-                title = text_information_frame.value
+                title = text_information_frame.information
             elif frame_id == "TPE1":
-                artist = text_information_frame.value
+                artist = text_information_frame.information
             elif frame_id == "TALB":
-                album = text_information_frame.value
+                album = text_information_frame.information
             elif frame_id == "TYER":
-                year = text_information_frame.value
+                year = text_information_frame.information
             elif frame_id == "TRCK":
-                value = text_information_frame.value.split("/", maxsplit=2)
+                value = text_information_frame.information.split("/", maxsplit=2)
                 track_number = int(value[0])
                 if len(value) == 2:
                     total_track_number = int(value[1])
