@@ -313,6 +313,85 @@ def decode_id3v2_3_comment_frame_data(data: bytes) -> DecodeId3v2_3CommentFrameR
     )
 
 
+def encode_id3v2_3_attached_picture_frame(
+    text_encoding: TextEncodingDescription,
+    mime_type: str,
+    picture_type: int,
+    description: str,
+    picture_data: bytes,
+) -> bytes:
+    bio = BytesIO()
+
+    if text_encoding == "ISO-8859-1":
+        text_encoding_python = "latin-1"
+        text_encoding_byte = 0
+        text_termination_bytes = b"\x00"
+    elif text_encoding == "Unicode":
+        text_encoding_python = "utf-16be"
+        text_encoding_byte = 1
+        text_termination_bytes = b"\x00\x00"
+    else:
+        raise Exception(
+            f"Unsupported text encoding ({text_encoding}). "
+            "Use ISO-8859-1 (latin-1) or Unicode (utf-16be)."
+        )
+
+    description_bytes = description.encode(encoding=text_encoding_python)
+
+    bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
+    bio.write(mime_type.encode("ascii"))
+    bio.write(b"\x00")
+    bio.write(picture_type.to_bytes(1, byteorder="big"))
+    bio.write(description_bytes)
+    bio.write(text_termination_bytes)  # NULL termination of content description
+    bio.write(picture_data)
+
+    return bio.getvalue()
+
+
+@dataclass
+class DecodeId3v2_3AttachedPictureFrameResult:
+    mime_type: str
+    picture_type: int
+    description: str
+    picture_data: bytes
+
+
+def decode_id3v2_3_attached_picture_frame_data(
+    data: bytes,
+) -> DecodeId3v2_3AttachedPictureFrameResult:
+    text_encoding_byte = data[0]
+
+    if text_encoding_byte == 0:
+        text_encoding_python = "latin-1"
+        text_termination_bytes = b"\x00"
+    elif text_encoding_byte == 1:
+        text_encoding_python = "utf-16"
+        text_termination_bytes = b"\x00\x00"
+    else:
+        raise Exception(
+            f"Unsupported text encoding byte ({text_encoding_byte}). "
+            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed."
+        )
+
+    mime_type_bytes, data_left = data[1:].split(b"\x00", maxsplit=2)
+    mime_type = mime_type_bytes.decode(encoding="ascii")
+
+    picture_type = data_left[0]
+    descirption_bytes, picture_data = data_left[1:].split(
+        text_termination_bytes, maxsplit=2
+    )
+
+    descirption = descirption_bytes.decode(encoding=text_encoding_python)
+
+    return DecodeId3v2_3AttachedPictureFrameResult(
+        mime_type=mime_type,
+        picture_type=picture_type,
+        description=descirption,
+        picture_data=picture_data,
+    )
+
+
 def encode_id3v2_3(
     title: str,
     artist: str,
@@ -427,6 +506,7 @@ class DecodeId3v2_3Result:
     comment: Optional[str]
     track_number: Optional[int]
     total_track_number: Optional[int]
+    attached_picture: Optional[DecodeId3v2_3AttachedPictureFrameResult]
     flag_is_unsynchronisation: bool
     flag_is_extended_header: bool
     flag_is_experimental_indicator: bool
@@ -472,6 +552,7 @@ def decode_id3v2_3(data: bytes) -> DecodeId3v2_3Result:
     album: Optional[str] = None
     year: Optional[str] = None
     comment: Optional[str] = None
+    attached_picture: Optional[DecodeId3v2_3AttachedPictureFrameResult] = None
     track_number: Optional[int] = None
     total_track_number: Optional[int] = None
 
@@ -505,6 +586,10 @@ def decode_id3v2_3(data: bytes) -> DecodeId3v2_3Result:
         elif frame_id == "COMM":
             comment_frame = decode_id3v2_3_comment_frame_data(data=frame_data)
             comment = comment_frame.actual_comment
+        elif frame_id == "APIC":
+            attached_picture = decode_id3v2_3_attached_picture_frame_data(
+                data=frame_data
+            )
         else:
             # unsupported frame
             pass
@@ -521,6 +606,7 @@ def decode_id3v2_3(data: bytes) -> DecodeId3v2_3Result:
         comment=comment,
         track_number=track_number,
         total_track_number=total_track_number,
+        attached_picture=attached_picture,
         flag_is_unsynchronisation=flag_is_unsynchronisation,
         flag_is_extended_header=flag_is_extended_header,
         flag_is_experimental_indicator=flag_is_experimental_indicator,
