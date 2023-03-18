@@ -11,6 +11,11 @@ This library is intended to be a non-GPL dependent ID3 tag parser.
 - Windows 10, Ubuntu 20.04
 - Python 3.9, 3.10, 3.11
 
+## Install
+
+```shell
+pip3 install aoirint-id3
+```
 
 ## Implementation
 
