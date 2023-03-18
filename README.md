@@ -13,6 +13,8 @@ This library is intended to be a non-GPL dependent ID3 tag parser.
 
 ## Install
 
+- [PyPI](https://pypi.org/project/aoirint-id3/)
+
 ```shell
 pip3 install aoirint-id3
 ```
