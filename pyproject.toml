@@ -22,6 +22,8 @@ name = "aoirint-id3"
 version = "0.0.0"
 description = ""
 authors = ["aoirint <aoirint@gmail.com>"]
+repository = "https://github.com/aoirint/id3py"
+license = "MIT"
 readme = "README.md"
 packages = [{include = "aoirint_id3"}]
 include = [
