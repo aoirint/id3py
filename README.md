@@ -99,5 +99,7 @@ poetry run pytest tests/
 
 - <https://web.archive.org/web/20210816205319/https://id3.org/id3v2-00>
 - <https://web.archive.org/web/20220525235101/https://id3.org/d3v2.3.0>
+- <https://web.archive.org/web/20220526212634/https://id3.org/id3v2.4.0-structure>
+- <https://web.archive.org/web/20211202225042/https://id3.org/id3v2.4.0-frames>
 - <https://ja.wikipedia.org/w/index.php?title=ID3%E3%82%BF%E3%82%B0&oldid=89477951>
 - <https://www.loc.gov/standards/iso639-2/php/code_list.php>
