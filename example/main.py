@@ -1,6 +1,7 @@
 # License: CC0-1.0
 
 from pathlib import Path
+from typing import Optional
 
 from aoirint_id3 import (
     decode_id3v1,
@@ -17,9 +18,11 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("input_file", type=Path)
+    parser.add_argument("--artwork_output_file", type=Path)
     args = parser.parse_args()
 
     input_file: Path = args.input_file
+    artwork_output_file: Optional[Path] = args.artwork_output_file
     audio_bytes = input_file.read_bytes()
 
     id3_versions = detect_id3_versions(audio_bytes)
@@ -44,6 +47,9 @@ def main():
         raise Exception("Unsupported audio bytes")
 
     print(f"{tag.title} - {tag.artist}")
+    if artwork_output_file is not None and hasattr(tag, "attached_picture") and tag.attached_picture is not None:
+        print(f"Saving artwork ({tag.attached_picture.mime_type}) to {artwork_output_file}")
+        artwork_output_file.write_bytes(tag.attached_picture.picture_data)
 
 
 if __name__ == "__main__":
