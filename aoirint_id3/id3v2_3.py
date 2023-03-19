@@ -4,6 +4,7 @@ import re
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from typing import List, Literal, Optional
+import codecs
 
 from pydantic import BaseModel, parse_obj_as
 
@@ -181,17 +182,19 @@ def encode_id3v2_3_text_information_frame_data(
 
     if text_encoding == "ISO-8859-1":
         text_encoding_python = "latin-1"
+        text_encoding_bom_bytes = b""
         text_encoding_byte = 0
-    elif text_encoding == "Unicode":
-        text_encoding_python = "utf-16be"  # UTF-16 Big Endian with BOM
+    elif text_encoding == "Unicode":  # UTF-16 Big Endian with BOM
+        text_encoding_python = "utf-16be"  # UTF-16 Big Endian without BOM
+        text_encoding_bom_bytes = codecs.BOM_UTF16_BE
         text_encoding_byte = 1
     else:
         raise Exception(
             f"Unsupported text encoding ({text_encoding}). "
-            "Use ISO-8859-1 (latin-1) or Unicode (utf-16be)."
+            "Use ISO-8859-1 (latin-1) or Unicode (utf-16be with BOM)."
         )
 
-    information_bytes = information.encode(encoding=text_encoding_python)
+    information_bytes = text_encoding_bom_bytes + information.encode(encoding=text_encoding_python)
 
     bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
     bio.write(information_bytes)
@@ -216,7 +219,7 @@ def decode_id3v2_3_text_information_frame_data(
     else:
         raise Exception(
             f"Unsupported text encoding byte ({text_encoding_byte}). "
-            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16) is allowed."
+            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16 with BOM) is allowed."
         )
 
     information = data[1:].decode(encoding=text_encoding_python)  # BOM removed
@@ -236,16 +239,18 @@ def encode_id3v2_3_comment_frame_data(
 
     if text_encoding == "ISO-8859-1":
         text_encoding_python = "latin-1"
+        text_encoding_bom_bytes = b""
         text_encoding_byte = 0
         text_termination_bytes = b"\x00"
-    elif text_encoding == "Unicode":
-        text_encoding_python = "utf-16be"  # UTF-16 Big Endian with BOM
+    elif text_encoding == "Unicode":  # UTF-16 Big Endian with BOM
+        text_encoding_python = "utf-16be"  # UTF-16 Big Endian without BOM
+        text_encoding_bom_bytes = codecs.BOM_UTF16_BE
         text_encoding_byte = 1
         text_termination_bytes = b"\x00\x00"
     else:
         raise Exception(
             f"Unsupported text encoding ({text_encoding}). "
-            "Use ISO-8859-1 (latin-1) or Unicode (utf-16be)."
+            "Use ISO-8859-1 (latin-1) or Unicode (utf-16be with BOM)."
         )
 
     # 2 or 3 latin alphabet code in lower case
@@ -260,10 +265,10 @@ def encode_id3v2_3_comment_frame_data(
     else:
         raise Exception("Invalid language bytes. This is bug?")
 
-    content_description_bytes = content_description.encode(
+    content_description_bytes = text_encoding_bom_bytes + content_description.encode(
         encoding=text_encoding_python
     )
-    actual_comment_bytes = actual_comment.encode(encoding=text_encoding_python)
+    actual_comment_bytes = text_encoding_bom_bytes + actual_comment.encode(encoding=text_encoding_python)
 
     bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
     bio.write(language_bytes)
@@ -293,7 +298,7 @@ def decode_id3v2_3_comment_frame_data(data: bytes) -> DecodeId3v2_3CommentFrameR
     else:
         raise Exception(
             f"Unsupported text encoding byte ({text_encoding_byte}). "
-            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16) is allowed."
+            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16 with BOM) is allowed."
         )
 
     language = decode_padded_str(data[1:4], encoding="ascii")
@@ -324,19 +329,21 @@ def encode_id3v2_3_attached_picture_frame(
 
     if text_encoding == "ISO-8859-1":
         text_encoding_python = "latin-1"
+        text_encoding_bom_bytes = b""
         text_encoding_byte = 0
         text_termination_bytes = b"\x00"
-    elif text_encoding == "Unicode":
-        text_encoding_python = "utf-16be"
+    elif text_encoding == "Unicode":  # UTF-16 Big Endian with BOM
+        text_encoding_python = "utf-16be"  # UTF-16 Big Endian without BOM
+        text_encoding_bom_bytes = codecs.BOM_UTF16_BE
         text_encoding_byte = 1
         text_termination_bytes = b"\x00\x00"
     else:
         raise Exception(
             f"Unsupported text encoding ({text_encoding}). "
-            "Use ISO-8859-1 (latin-1) or Unicode (utf-16be)."
+            "Use ISO-8859-1 (latin-1) or Unicode (utf-16 with BOM)."
         )
 
-    description_bytes = description.encode(encoding=text_encoding_python)
+    description_bytes = text_encoding_bom_bytes + description.encode(encoding=text_encoding_python)
 
     bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
     bio.write(mime_type.encode("ascii"))
@@ -371,7 +378,7 @@ def decode_id3v2_3_attached_picture_frame_data(
     else:
         raise Exception(
             f"Unsupported text encoding byte ({text_encoding_byte}). "
-            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16be) is allowed."
+            "Only 0 (ISO-8859-1, latin-1) or 1 (Unicode, utf-16 with BOM) is allowed."
         )
 
     mime_type_bytes, data_left = data[1:].split(b"\x00", maxsplit=1)
