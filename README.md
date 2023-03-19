@@ -21,32 +21,7 @@ pip3 install aoirint-id3
 
 ## Usage
 
-```python
-from aoirint_id3 import (
-    detect_id3_versions,
-    decode_id3v2_3,
-    decode_id3v2_2,
-    decode_id3v1_1,
-    decode_id3v1,
-)
-from pathlib import Path
-
-audio_bytes = Path("audio.mp3").read_bytes()
-
-id3_versions = detect_id3_versions(audio_bytes)
-if "ID3v2.3" in id3_versions:
-    tag = decode_id3v2_3(audio_bytes)
-elif "ID3v2.2" in id3_versions:
-    tag = decode_id3v2_2(audio_bytes)
-elif "ID3v1.1" in id3_versions:
-    tag = decode_id3v1_1(audio_bytes, encoding="latin-1")
-elif "ID3v1" in id3_versions:
-    tag = decode_id3v1(audio_bytes, encoding="latin-1")
-else:
-    raise Exception("Unsupported audio bytes")
-
-print(f"{tag.title} - {tag.artist}")
-```
+See [example](example/main.py).
 
 ## Implementation
 
