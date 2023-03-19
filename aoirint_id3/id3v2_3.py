@@ -477,7 +477,7 @@ def encode_id3v2_3(
     extended_header_bytes = encode_id3v2_3_extended_header(
         crc_data_present=None,
         size_of_padding=0,
-    )
+    ) if flag_is_extended_header else b''
 
     # header
     size = len(extended_header_bytes) + len(frames_bytes)
