@@ -42,8 +42,10 @@ class DecodeId3v1Result:
 
 
 def decode_id3v1(data: bytes, encoding: str) -> DecodeId3v1Result:
-    if len(data) != 128:
-        raise Exception(f"ID3v1: Invalid data length ({len(data)} != 128).")
+    if len(data) < 128:
+        raise Exception(f"ID3v1: Invalid data length ({len(data)} < 128).")
+
+    data = data[-128:]
 
     bio = BytesIO(data)
     identifier = bio.read(3)
