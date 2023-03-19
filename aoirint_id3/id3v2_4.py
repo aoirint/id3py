@@ -677,8 +677,25 @@ def decode_id3v2_4(data: bytes) -> DecodeId3v2_4Result:
     while size_left > 0:
         frame_id = bio.read(4).decode("ascii")
         frame_size = decode_id3v2_4_synchsafe_integer(encoded=bio.read(4), length=4)
-        int.from_bytes(bio.read(1), byteorder="big")  # frame_flag1
-        int.from_bytes(bio.read(1), byteorder="big")  # frame_flag2
+        frame_flag1 = int.from_bytes(bio.read(1), byteorder="big")  # frame_flag1
+        frame_flag2 = int.from_bytes(bio.read(1), byteorder="big")  # frame_flag2
+
+        if (frame_flag2 & 0b0100_0000) == 0b0100_0000:  # group identity
+            bio.read(1)  # group identifier byte
+
+        if (frame_flag2 & 0b0000_1000) == 0b0000_1000:  # compression
+            pass  # TODO: not implemented. ignore
+
+        if (frame_flag2 & 0b0000_0100) == 0b0000_0100:  # encryption
+            # TODO: not implemented. ignore
+            bio.read(1)  # encryption method byte
+
+        if (frame_flag2 & 0b0000_0010) == 0b0000_0010:  # unsynchronisation
+            pass
+
+        if (frame_flag2 & 0b0000_0001) == 0b0000_0001:  # data length indicator
+            decode_id3v2_4_synchsafe_integer(encoded=bio.read(4), length=4)  # data length indicator (32 bit synchsafe integer)
+
         frame_data = bio.read(frame_size)
 
         if frame_id[0] == "T":
