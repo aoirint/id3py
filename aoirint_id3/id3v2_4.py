@@ -480,12 +480,12 @@ def decode_id3v2_4_attached_picture_frame_data(
         text_termination_bytes, maxsplit=1
     )
 
-    descirption = descirption_bytes.decode(encoding=text_encoding_python)
+    description = descirption_bytes.decode(encoding=text_encoding_python)
 
     return DecodeId3v2_4AttachedPictureFrameResult(
         mime_type=mime_type,
         picture_type=picture_type,
-        description=descirption,
+        description=description,
         picture_data=picture_data,
     )
 
