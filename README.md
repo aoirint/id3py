@@ -39,9 +39,9 @@ if "ID3v2.3" in id3_versions:
 elif "ID3v2.2" in id3_versions:
     tag = decode_id3v2_2(audio_bytes)
 elif "ID3v1.1" in id3_versions:
-    tag = decode_id3v1_1(audio_bytes)
+    tag = decode_id3v1_1(audio_bytes, encoding="latin1")
 elif "ID3v1" in id3_versions:
-    tag = decode_id3v1(audio_bytes)
+    tag = decode_id3v1(audio_bytes, encoding="latin1")
 else:
     raise Exception("Unsupported audio bytes")
 
