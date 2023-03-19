@@ -1,10 +1,10 @@
+import codecs
 import csv
 import importlib.resources as ILR
 import re
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from typing import List, Literal, Optional
-import codecs
 
 from pydantic import BaseModel, parse_obj_as
 
@@ -113,7 +113,9 @@ def encode_id3v2_2_text_information_frame(
             "Use ISO-8859-1 (latin-1) or Unicode (utf-16be)."
         )
 
-    information_bytes = text_encoding_bom_bytes + information.encode(encoding=text_encoding_python)
+    information_bytes = text_encoding_bom_bytes + information.encode(
+        encoding=text_encoding_python
+    )
 
     frame_size = 1 + len(
         information_bytes
@@ -192,7 +194,9 @@ def encode_id3v2_2_comment_frame(
     content_description_bytes = text_encoding_bom_bytes + content_description.encode(
         encoding=text_encoding_python
     )
-    actual_comment_bytes = text_encoding_bom_bytes + actual_comment.encode(encoding=text_encoding_python)
+    actual_comment_bytes = text_encoding_bom_bytes + actual_comment.encode(
+        encoding=text_encoding_python
+    )
 
     frame_size = (
         1

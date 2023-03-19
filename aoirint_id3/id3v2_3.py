@@ -1,10 +1,10 @@
+import codecs
 import csv
 import importlib.resources as ILR
 import re
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from typing import List, Literal, Optional
-import codecs
 
 from pydantic import BaseModel, parse_obj_as
 
@@ -194,7 +194,9 @@ def encode_id3v2_3_text_information_frame_data(
             "Use ISO-8859-1 (latin-1) or Unicode (utf-16be with BOM)."
         )
 
-    information_bytes = text_encoding_bom_bytes + information.encode(encoding=text_encoding_python)
+    information_bytes = text_encoding_bom_bytes + information.encode(
+        encoding=text_encoding_python
+    )
 
     bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
     bio.write(information_bytes)
@@ -268,7 +270,9 @@ def encode_id3v2_3_comment_frame_data(
     content_description_bytes = text_encoding_bom_bytes + content_description.encode(
         encoding=text_encoding_python
     )
-    actual_comment_bytes = text_encoding_bom_bytes + actual_comment.encode(encoding=text_encoding_python)
+    actual_comment_bytes = text_encoding_bom_bytes + actual_comment.encode(
+        encoding=text_encoding_python
+    )
 
     bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
     bio.write(language_bytes)
@@ -343,7 +347,9 @@ def encode_id3v2_3_attached_picture_frame(
             "Use ISO-8859-1 (latin-1) or Unicode (utf-16 with BOM)."
         )
 
-    description_bytes = text_encoding_bom_bytes + description.encode(encoding=text_encoding_python)
+    description_bytes = text_encoding_bom_bytes + description.encode(
+        encoding=text_encoding_python
+    )
 
     bio.write(text_encoding_byte.to_bytes(1, byteorder="big"))
     bio.write(mime_type.encode("ascii"))
@@ -481,10 +487,14 @@ def encode_id3v2_3(
 
     frames_bytes = frames_bio.getvalue()
 
-    extended_header_bytes = encode_id3v2_3_extended_header(
-        crc_data_present=None,
-        size_of_padding=0,
-    ) if flag_is_extended_header else b''
+    extended_header_bytes = (
+        encode_id3v2_3_extended_header(
+            crc_data_present=None,
+            size_of_padding=0,
+        )
+        if flag_is_extended_header
+        else b""
+    )
 
     # header
     size = len(extended_header_bytes) + len(frames_bytes)
