@@ -7,6 +7,7 @@ from aoirint_id3 import (
     decode_id3v1_1,
     decode_id3v2_2,
     decode_id3v2_3,
+    decode_id3v2_4,
     detect_id3_versions,
 )
 
@@ -24,7 +25,10 @@ def main():
     id3_versions = detect_id3_versions(audio_bytes)
     print(f"ID3 versions: {id3_versions}")
 
-    if "ID3v2.3" in id3_versions:
+    if "ID3v2.4" in id3_versions:
+        print(f"Decoded as ID3v2.4")
+        tag = decode_id3v2_4(audio_bytes)
+    elif "ID3v2.3" in id3_versions:
         print(f"Decoded as ID3v2.3")
         tag = decode_id3v2_3(audio_bytes)
     elif "ID3v2.2" in id3_versions:
