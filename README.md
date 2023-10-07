@@ -86,7 +86,6 @@ poetry add --group build 'mypackage'
 ```shell
 poetry export --without-hashes -o requirements.txt
 poetry export --without-hashes --with dev -o requirements-dev.txt
-poetry export --without-hashes --with build -o requirements-build.txt
 ```
 
 ### Run pytest
