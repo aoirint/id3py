@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from io import BytesIO, StringIO
 from typing import List
 
-from pydantic import BaseModel, parse_obj_as
+from pydantic import BaseModel, TypeAdapter
 
 from .utils import decode_padded_str, safe_ljust
 
@@ -22,7 +22,7 @@ def __load_available_genres() -> List[AvailableGenre]:
     next(reader)
 
     records = list(reader)
-    return parse_obj_as(List[AvailableGenre], records)
+    return TypeAdapter(List[AvailableGenre]).validate_python(records)
 
 
 available_genres = __load_available_genres()

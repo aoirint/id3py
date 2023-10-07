@@ -33,7 +33,7 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pydantic = "^1.10.4"
+pydantic = "^2.4.2"
 
 
 [tool.poetry.group.dev.dependencies]
