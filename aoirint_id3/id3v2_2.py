@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from io import BytesIO, StringIO
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel, parse_obj_as
+from pydantic import BaseModel, TypeAdapter
 
 from .utils import decode_padded_str, safe_ljust
 
@@ -25,7 +25,7 @@ def __load_available_frame_ids() -> List[AvailableFrameId]:
     )
 
     records = list(reader)
-    return parse_obj_as(List[AvailableFrameId], records)
+    return TypeAdapter(List[AvailableFrameId]).validate_python(records)
 
 
 available_frame_ids = __load_available_frame_ids()
